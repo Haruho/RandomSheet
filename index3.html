@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Music Notation Generator</title>
+  <script src="/releases/vexflow-min.js"></script>
+  <style>
+    #Group{
+        width: 90px;
+        height: max-content;
+    }
+  </style>
+</head>
+<body>
+
+<div>
+  <div id="boo"></div>
+  <h1>Random Music Notation Generator</h1>
+  <input type="number" id="barnum" name="barnum" min="1" max="10" value="3" />
+  <button onclick="rendererSheets()">生成音符</button>
+  <!-- <button onclick="originSheet()">Notation</button> -->
+  <div id = "Group_dazi">
+    <!-- C1 -->
+    <input type="checkbox" name="dazi1" onchange="getGroups(checked,'C1')">
+    <label for="xiaozi">大字1组 | </label>
+    <!-- C2 -->
+    <input type="checkbox" name="dazi" onchange="getGroups(checked,'C')">
+    <label for="xiaozi">大字组 | </label>
+    <!-- C3 -->
+    <input type="checkbox" name="xiaozi" onchange="getGroups(checked,'c')">
+    <label for="xiaozi">小字组 | </label>
+    <!-- C4 -->
+    <input type="checkbox" name="xiaozi1" onchange="getGroups(checked,'c1')">
+    <!-- //中央C C4 = 小子一组c1 -->
+    <label for="xiaozi">小字1组 | </label>   
+<!-- C5 -->
+    <input type="checkbox" name="xiaozi2" onchange="getGroups(checked,'c2')">
+    <label for="xiaozi">小字2组 | </label>
+    <!-- C6 -->
+    <input type="checkbox" name="xiaozi3" onchange="getGroups(checked,'c3')">
+    <label for="xiaozi">小字3组 | </label>
+    <!-- C7 -->
+    <input type="checkbox" name="xiaozi4" onchange="getGroups(checked,'c4')">
+    <label for="xiaozi">小字4组 | </label>
+    <!-- C8
+    <input type="checkbox" name="xiaozi5" onchange="getGroups(checked,'c5')">
+    <label for="xiaozi">小字5组</label> -->
+  </div>
+</div>
+
+<script>
+    //关键类
+    const { Renderer, Stave, StaveNote, Voice, Formatter, BarNote,Beam } = Vex.Flow;
+    const div = document.getElementById("boo");
+    //渲染在div
+    const renderer = new Renderer(div, Renderer.Backends.SVG);
+    //width height
+    renderer.resize(720, 130);
+    const context = renderer.getContext();
+
+    function originSheet(){
+            //left top width
+        const staveMeasure1 = new Stave(10, 0, 300);
+        //第一小节添加谱号
+        //treble高音  bass低音
+        staveMeasure1.addClef("treble").setContext(context).draw();
+
+        const notesMeasure1 = [
+                new StaveNote({ keys: ["c/4"], duration: "q" }), 
+                new StaveNote({ keys: ["d/4"], duration: "q" }), 
+                new StaveNote({ keys: ["b/4"], duration: "qr" }), 
+                new StaveNote({ keys: ["c/4", "e/4", "g/4"], duration: "q" })
+            ];
+
+        // Helper function to justify and draw a 4/4 voice
+        Formatter.FormatAndDraw(context, staveMeasure1, notesMeasure1);
+        //新小结只是新建一个小节并且添加在前一个小节的后面·
+        // Measure 2 - second measure is placed adjacent to first measure.
+        const staveMeasure2 = new Stave(staveMeasure1.width + staveMeasure1.x, 0, 400);
+        console.log(staveMeasure1.width  + "    " + staveMeasure1.x);
+
+        const notesMeasure2_part1 = [
+                new StaveNote({ keys: ["c/4"], duration: "8" }), 
+                new StaveNote({ keys: ["d/4"], duration: "8" }), 
+                new StaveNote({ keys: ["b/4"], duration: "8" }), 
+                new StaveNote({ keys: ["c/4", "e/4", "g/4"], duration: "8" })];
+
+        const notesMeasure2_part2 = [
+                new StaveNote({ keys: ["c/4"], duration: "8" }), 
+                new StaveNote({ keys: ["d/4"], duration: "8" }), 
+                new StaveNote({ keys: ["b/4"], duration: "8" }), 
+                new StaveNote({ keys: ["c/4", "e/4", "g/4"], duration: "8" })];
+
+        // Create the beams for 8th notes in second measure.
+        const beam1 = new Beam(notesMeasure2_part1);
+        const beam2 = new Beam(notesMeasure2_part2);
+
+        const notesMeasure2 = notesMeasure2_part1.concat(notesMeasure2_part2);
+
+        staveMeasure2.setContext(context).draw();
+        Formatter.FormatAndDraw(context, staveMeasure2, notesMeasure2);
+
+        // Render beams
+        beam1.setContext(context).draw();
+        beam2.setContext(context).draw();
+    }
+    const noteName = ['C','D','E','F','G','A','B'];
+    var groupNum =[];
+    function getGroups(checked,marker){
+        if(checked){
+            switch(marker){
+                case 'C1':
+                    if(groupNum.indexOf(1) == -1){
+                        groupNum.push(1);
+                    }
+                    break;
+                case 'C':
+                    if(groupNum.indexOf(2) == -1){
+                        groupNum.push(2);
+                    }
+                    break;
+                case 'c':
+                    if(groupNum.indexOf(3) == -1){
+                        groupNum.push(3);
+                    }
+                    break;
+                case 'c1':
+                if(groupNum.indexOf(4) == -1){
+                        groupNum.push(4);
+                    }
+                    break;
+                case 'c2':
+                if(groupNum.indexOf(5) == -1){
+                        groupNum.push(5);
+                    }
+                    break;
+                case 'c3':
+                if(groupNum.indexOf(6) == -1){
+                        groupNum.push(6);
+                    }
+                    break;
+                case 'c4':
+                if(groupNum.indexOf(7) == -1){
+                        groupNum.push(7);
+                    }
+                    break;
+            }
+            console.log(groupNum);
+        }
+    }
+    function getRandomNotes(){
+        const randomNoteName = noteName[Math.floor(Math.random() * noteName.length)];
+        const randomNotegroup = groupNum[Math.floor(Math.random() * groupNum.length)];
+        return randomNoteName + '/' + randomNotegroup;
+    }
+    function rendererSheets(){
+        //console.log(getRandomNotes());
+        //Formatter.Formatter.clear();
+        //先获取范围
+        if(groupNum.length == 0){
+            alert("请选择组别");
+        }else{
+            var barNum = document.getElementById("barnum").value;
+            renderer.resize(barNum * 300 + 20, 130);
+            for(i = 1;i<=barNum;i++){
+                //第一个小节添加谱号和拍号
+                if(i == 1){
+                    const stave_bar = new Stave(10, 0, 300);
+                    stave_bar.addClef("treble").setContext(context).draw();
+                    const notes = [
+                        new StaveNote({ keys: [getRandomNotes()], duration: "q" }), 
+                        new StaveNote({ keys: [getRandomNotes()], duration: "q" }), 
+                        //qr是空拍休止符
+                        new StaveNote({ keys: [getRandomNotes()], duration: "q" }), 
+                        new StaveNote({ keys: [getRandomNotes()], duration: "q" })
+                    ];
+                    Formatter.FormatAndDraw(context, stave_bar, notes);
+                }else{
+                    const stave_bar = new Stave(10 + 300 * (i-1), 0, 300);
+                    stave_bar.setContext(context).draw();
+                    const notes = [
+                        new StaveNote({ keys: [getRandomNotes()], duration: "q" }), 
+                        new StaveNote({ keys: [getRandomNotes()], duration: "q" }), 
+                        new StaveNote({ keys: [getRandomNotes()], duration: "q" }), 
+                        new StaveNote({ keys: [getRandomNotes()], duration: "q" })
+                    ];
+                    Formatter.FormatAndDraw(context, stave_bar, notes);
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
